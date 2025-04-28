@@ -26,7 +26,7 @@ export const Quiz = (): JSX.Element => {
         <ul className="list-none">
           {quiz.activities.map((activity: ActivityType, index) => (
             <li key={index}>
-              <NavLink to={`${index}/0`}>
+              <NavLink to={`${index}`}>
                 <span>{activity.activity_name}</span>
               </NavLink>
             </li>

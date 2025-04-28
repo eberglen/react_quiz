@@ -1,8 +1,8 @@
-import { useParams } from 'react-router-dom'
+import { Outlet, useParams } from 'react-router-dom'
 import { useAppSelector } from '../app/hooks'
 import { selectQuestionByIndex } from '../features/quiz/quizSlice'
 
-function Question() {
+function Activity() {
   const { activityId, questiondId } = useParams()
   const questionDetails = useAppSelector((state) =>
     selectQuestionByIndex(state, Number(activityId))
@@ -10,11 +10,12 @@ function Question() {
 
   return (
     <div>
+      Activity
       {/* {JSON.stringify(questionDetails)} */}
-      hey
       <p>{questiondId}</p>
+      <Outlet />
     </div>
   )
 }
 
-export default Question
+export default Activity
