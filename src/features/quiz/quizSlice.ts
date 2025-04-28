@@ -67,6 +67,8 @@ export default quizSlice.reducer
 export const selectQuiz = (state: RootState) => state.quiz.value
 export const selectStatus = (state: RootState) => state.quiz.status
 export const selectIsFetched = (state: RootState) => state.quiz.value.name
+export const selectQuestionByIndex = (state: RootState, activityId: number, questionId: number) =>
+  state.quiz.value.activities?.[activityId]?.questions?.[questionId]
 
 export const getQuiz = createAsyncThunk('quiz/fetchQuiz', async () => {
   const response = await fetchQuiz()

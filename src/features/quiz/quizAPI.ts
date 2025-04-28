@@ -1,9 +1,15 @@
-// A mock function to mimic making an async request for data
+export type ActivityType = {
+  activity_name: string
+  order: number
+  questions: object[]
+}
+
 export type QuizType = {
   name: string
   heading: string
-  activities: object[]
+  activities: ActivityType[]
 }
+
 export const fetchQuiz = (): Promise<QuizType> =>
   // Temp solution for cors
   fetch(
