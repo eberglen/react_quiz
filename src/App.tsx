@@ -5,6 +5,7 @@ import NotFound from './screens/NotFound'
 import Activity from './screens/Activity'
 import Layout from './Layout'
 import Question from './screens/Question'
+import Round from './screens/Round'
 
 function App() {
   return (
@@ -12,9 +13,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path=":activityId" element={<Activity />}>
-            <Route path=":roundId?/:questionId" element={<Question />} />
-          </Route>
+          <Route path="question/:activityId" element={<Question />} />
+          <Route path="round/:activityId" element={<Round />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -22,4 +22,9 @@ function App() {
   )
 }
 
+// quiz > question > result
+// quiz > round > question > round > question > result
+
+// different selectors
+// different flow
 export default App

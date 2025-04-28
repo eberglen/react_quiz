@@ -1,11 +1,11 @@
 import { Outlet, useParams } from 'react-router-dom'
 import { useAppSelector } from '../app/hooks'
-import { selectQuestionByIndex } from '../features/quiz/quizSlice'
+import { selectQuestionByActivityId } from '../features/quiz/quizSlice'
 
 function Activity() {
   const { activityId, questiondId } = useParams()
   const questionDetails = useAppSelector((state) =>
-    selectQuestionByIndex(state, Number(activityId))
+    selectQuestionByActivityId(state, Number(activityId))
   )
 
   return (
@@ -13,7 +13,6 @@ function Activity() {
       Activity
       {/* {JSON.stringify(questionDetails)} */}
       <p>{questiondId}</p>
-      <Outlet />
     </div>
   )
 }

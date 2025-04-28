@@ -1,9 +1,18 @@
 import { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import type { JSX } from 'react'
-import { getQuiz, selectIsFetched, selectQuiz, selectStatus } from './quizSlice'
+import {
+  getQuiz,
+  selectIsFetched,
+  selectQuiz,
+  selectStatus,
+  setActivityType,
+  setQuestionId,
+  setRoundId,
+} from './quizSlice'
 import { ActivityType } from './quizAPI'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { checkActivityType } from '../../lib/helpers'
 
 export const Quiz = (): JSX.Element => {
   const dispatch = useAppDispatch()
@@ -26,9 +35,7 @@ export const Quiz = (): JSX.Element => {
         <ul className="list-none">
           {quiz.activities.map((activity: ActivityType, index) => (
             <li key={index}>
-              <NavLink to={`${index}`}>
-                <span>{activity.activity_name}</span>
-              </NavLink>
+              <ActivityLink activity={activity} activityId={index} />
             </li>
             // <div key={index} onClick={()=>}>{activity.activity_name}</div>
           ))}
@@ -37,4 +44,30 @@ export const Quiz = (): JSX.Element => {
       </div>
     </div>
   )
+}
+
+const ActivityLink = ({ activity, activityId }: { activity: ActivityType; activityId: number }) => {
+  const navigate = useNavigate()
+  const dispatch = useAppDispatch()
+
+  const handleNavigate = () => {
+    const activityType = checkActivityType(activity.questions)
+    switch (activityType) {
+      case 'round':
+        dispatch(setActivityType({ activityId, type: activityType }))
+        dispatch(setRoundId({ activityId, roundId: 0 }))
+        dispatch(setQuestionId({ activityId, questionId: 0 }))
+        navigate(`../${activityType}/${activityId}`)
+        break
+      case 'question':
+        dispatch(setActivityType({ activityId, type: activityType }))
+        dispatch(setQuestionId({ activityId, questionId: 0 }))
+        navigate(`../${activityType}/${activityId}`)
+        break
+      default:
+        navigate('../error?invalidActivityType')
+    }
+  }
+
+  return <div onClick={handleNavigate}>{activity.activity_name}</div>
 }
