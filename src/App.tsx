@@ -2,7 +2,6 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import './App.css'
 import Home from './screens/Home'
 import NotFound from './screens/NotFound'
-import Activity from './screens/Activity'
 import Layout from './Layout'
 import Question from './screens/Question'
 import Round from './screens/Round'
@@ -24,9 +23,4 @@ function App() {
   )
 }
 
-// quiz > question > result
-// quiz > round > question > round > question > result
-
-// different selectors
-// different flow
 export default App

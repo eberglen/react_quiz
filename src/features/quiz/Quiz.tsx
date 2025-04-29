@@ -6,13 +6,12 @@ import {
   selectIsFetched,
   selectQuiz,
   selectStatus,
-  setActivityType,
   setQuestionId,
   setRoundId,
 } from './quizSlice'
-import { ActivityType } from './quizAPI'
-import { NavLink, useNavigate } from 'react-router-dom'
-import { checkActivityType, isQuestionRoundType, isQuestionType } from '../../lib/helpers'
+import { Activity } from './quizAPI'
+import { useNavigate } from 'react-router-dom'
+import { isQuestionRoundType, isQuestionType } from '../../lib/helpers'
 
 export const Quiz = (): JSX.Element => {
   const dispatch = useAppDispatch()
@@ -22,7 +21,6 @@ export const Quiz = (): JSX.Element => {
 
   useEffect(() => {
     if (status === 'idle' && !isFetched) {
-      console.log('hey')
       dispatch(getQuiz())
     }
   }, [dispatch])
@@ -33,20 +31,18 @@ export const Quiz = (): JSX.Element => {
         <p>{quiz?.name}</p>
         <p>{quiz?.heading}</p>
         <ul className="list-none">
-          {quiz.activities.map((activity: ActivityType, index) => (
+          {quiz.activities.map((activity: Activity, index) => (
             <li key={index}>
               <ActivityLink activity={activity} activityId={index} />
             </li>
-            // <div key={index} onClick={()=>}>{activity.activity_name}</div>
           ))}
         </ul>
-        {/* <span>{JSON.stringify(quiz)}</span> */}
       </div>
     </div>
   )
 }
 
-const ActivityLink = ({ activity, activityId }: { activity: ActivityType; activityId: number }) => {
+const ActivityLink = ({ activity, activityId }: { activity: Activity; activityId: number }) => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 

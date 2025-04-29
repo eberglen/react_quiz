@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAppSelector } from '../app/hooks'
 import { selectRounds } from '../features/quiz/quizSlice'
-import { QuestionRoundType, QuestionType } from '../features/quiz/quizAPI'
+import { QuestionRound, Question } from '../features/quiz/quizAPI'
 import { isQuestionRoundType, isQuestionType } from '../lib/helpers'
 
 function Result() {
@@ -10,7 +10,7 @@ function Result() {
   const navigate = useNavigate()
   return (
     <div>
-      {rounds.map((round: QuestionType | QuestionRoundType, index) => {
+      {rounds.map((round: Question | QuestionRound, index) => {
         if (isQuestionType(round)) {
           return <QuestionResult question={round} key={index} />
         } else if (isQuestionRoundType(round)) {
@@ -22,7 +22,7 @@ function Result() {
   )
 }
 
-function QuestionResult({ question }: { question: QuestionType }) {
+function QuestionResult({ question }: { question: Question }) {
   return (
     <p>
       Q{question.order}------
@@ -31,7 +31,7 @@ function QuestionResult({ question }: { question: QuestionType }) {
   )
 }
 
-function RoundResult({ rounds }: { rounds: QuestionRoundType }) {
+function RoundResult({ rounds }: { rounds: QuestionRound }) {
   return (
     <div>
       <p>{rounds.round_title}</p>

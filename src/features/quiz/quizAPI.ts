@@ -1,19 +1,18 @@
 export type QuizType = {
   name: string
   heading: string
-  activities: ActivityType[]
+  activities: Activity[]
 }
 
-export type ActivityType = {
+export type Activity = {
   activity_name: string
   order: number
-  questions: QuestionType[] | QuestionRoundType[]
+  questions: Question[] | QuestionRound[]
   current_question?: number
   current_round?: number
-  type?: 'round' | 'question' | undefined //TODO: create separate type
 }
 
-export type QuestionType = {
+export type Question = {
   is_correct: boolean
   stimulus: string
   order: number
@@ -21,11 +20,13 @@ export type QuestionType = {
   feedback: string
 }
 
-export type QuestionRoundType = {
+export type QuestionRound = {
   round_title: string
   order: number
-  questions: QuestionType[]
+  questions: Question[]
 }
+
+export type ActivityType = 'round' | 'question' | undefined
 
 export const fetchQuiz = (): Promise<QuizType> =>
   // Temp solution for cors

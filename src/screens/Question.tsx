@@ -1,62 +1,59 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../app/hooks'
 import {
-  selectActivityType,
   selectCurrentQuestion,
   selectCurrentRound,
-  selectQuestionByActivityId,
+  selectQuestion,
   selectQuestions,
-  selectQuestionsLength,
-  selectRoundLength,
+  selectQuiz,
   selectRounds,
   setAnswer,
   setQuestionId,
   setRoundId,
 } from '../features/quiz/quizSlice'
+import { isListQuestionRoundType, isListQuestionType } from '../lib/helpers'
 
 function Question() {
   const { activityId } = useParams()
+  const questionDetails = useAppSelector((state) => selectQuestion(state, Number(activityId)))
+
+  if (questionDetails === undefined) return <Navigate to="/" />
+
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const activityType = useAppSelector((state) => selectActivityType(state, Number(activityId)))
+
+  const quiz = useAppSelector(selectQuiz)
   const currentQuestion = useAppSelector((state) =>
     selectCurrentQuestion(state, Number(activityId))
   )
   const questions = useAppSelector((state) => selectQuestions(state, Number(activityId)))
-
-  const questionDetails = useAppSelector((state) =>
-    selectQuestionByActivityId(state, Number(activityId))
-  )
-
   const currentRound = useAppSelector((state) => selectCurrentRound(state, Number(activityId)))
-
   const rounds = useAppSelector((state) => selectRounds(state, Number(activityId)))
 
   const handleAnswer = (user_answer: boolean) => {
     dispatch(setAnswer({ activityId: Number(activityId), user_answer }))
-    // dispatch(setQuestionId({ activityId: Number(activityId), questionId: currentQuestion + 1 }))
-    if (currentQuestion === undefined) return
-    if (currentQuestion < questions.length - 1) {
-      console.log('Next Question')
+    const isLastQuestion = currentQuestion === questions.length - 1
+
+    if (isLastQuestion) {
+      const questions = quiz.activities[Number(activityId)].questions
+      if (isListQuestionType(questions)) {
+        // navigate to result
+        navigate(`../result/${activityId}`)
+      } else if (isListQuestionRoundType(questions)) {
+        const isLastRound = currentRound === rounds.length - 1
+        if (isLastRound) {
+          // navigate to result
+          navigate(`../result/${activityId}`)
+        } else {
+          // proceed to next round
+          dispatch(setRoundId({ activityId: Number(activityId), roundId: currentRound + 1 }))
+          dispatch(setQuestionId({ activityId: Number(activityId), questionId: 0 }))
+          navigate(`../round/${activityId}`)
+        }
+      }
+    } else {
       // proceed to next question
       dispatch(setQuestionId({ activityId: Number(activityId), questionId: currentQuestion + 1 }))
-    } else if (activityType === 'question') {
-      navigate(`../result/${activityId}`)
-      console.log('Question Result')
-      // navigate to result
-    } else if (activityType === 'round') {
-      if (currentRound === rounds.length - 1) {
-        navigate(`../result/${activityId}`)
-        console.log('Round Result')
-        // navigate to result
-      } else {
-        if (currentRound === undefined) return
-        console.log('Next Round')
-        // proceed to next round
-        dispatch(setRoundId({ activityId: Number(activityId), roundId: currentRound + 1 }))
-        dispatch(setQuestionId({ activityId: Number(activityId), questionId: 0 }))
-        navigate(`../round/${activityId}`)
-      }
     }
   }
   return (
