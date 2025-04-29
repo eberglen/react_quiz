@@ -1,21 +1,11 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { fetchQuiz, QuestionRound, Question, QuizType, ActivityType } from './quizAPI'
+import { fetchQuiz, TQuestionRound, TQuestion, TQuiz, TActivity } from './quizAPI'
 import { RootState } from '../../app/store'
-import { isListQuestionRoundType, isListQuestionType } from '../../lib/helpers'
 
 export interface QuizState {
-  value: QuizType
+  value: TQuiz
   status: 'idle' | 'loading' | 'failed'
-}
-
-export type QuestionPayload = {
-  activityId: number
-  questionId: number
-}
-
-export type RoundPayload = {
-  activityId: number
-  roundId: number
+  isFetched: Boolean
 }
 
 export type AnswerPayload = {
@@ -23,32 +13,44 @@ export type AnswerPayload = {
   user_answer: boolean
 }
 
-export type ActivityTypePayload = {
-  activityId: number
-  type: ActivityType
-}
-
 const initialState: QuizState = {
   value: { name: '', heading: '', activities: [] },
   status: 'idle',
+  isFetched: false,
 }
+
+export const getQuiz = createAsyncThunk('quiz/fetchQuiz', async () => {
+  const response = await fetchQuiz()
+  return response
+})
 
 export const quizSlice = createSlice({
   name: 'quiz',
   initialState,
   reducers: {
-    setQuestionId: (state, action: PayloadAction<QuestionPayload>) => {
-      const { activityId, questionId } = action.payload
-      state.value.activities[activityId].current_question = questionId
+    setComplete: (state, action: PayloadAction<number>) => {
+      const activityId = action.payload
+      state.value.activities[activityId].is_completed = true
     },
-    setRoundId: (state, action: PayloadAction<RoundPayload>) => {
-      const { activityId, roundId } = action.payload
-      state.value.activities[activityId].current_round = roundId
+    setNextQuestion: (state, action: PayloadAction<number>) => {
+      const activityId = action.payload
+      state.value.activities[activityId].current_question += 1
+    },
+    setNextRound: (state, action: PayloadAction<number>) => {
+      const activityId = action.payload
+      const activity = state.value.activities[activityId]
+      if (activity.type === 'round') {
+        activity.current_round += 1
+        activity.current_question = 0
+      }
     },
     setAnswer: (state, action: PayloadAction<AnswerPayload>) => {
       const { activityId, user_answer } = action.payload
       const question = getQuestionFromActivity(state, activityId)
       if (question) question.user_answers = user_answer
+    },
+    setUnfetch: (state) => {
+      state.isFetched = false
     },
   },
   extraReducers: (builder) => {
@@ -58,7 +60,11 @@ export const quizSlice = createSlice({
       })
       .addCase(getQuiz.fulfilled, (state, action) => {
         state.status = 'idle'
-        state.value = action.payload
+        state.value = {
+          ...action.payload,
+          activities: action.payload.activities.map(transformActivity),
+        }
+        state.isFetched = true
       })
       .addCase(getQuiz.rejected, (state, action) => {
         console.error(action.error)
@@ -67,51 +73,86 @@ export const quizSlice = createSlice({
   },
 })
 
-export const { setQuestionId, setRoundId, setAnswer } = quizSlice.actions
+export const { setNextQuestion, setNextRound, setAnswer, setUnfetch, setComplete } =
+  quizSlice.actions
 
 export default quizSlice.reducer
 
 export const selectQuiz = (state: RootState) => state.quiz.value
 export const selectStatus = (state: RootState) => state.quiz.status
-export const selectIsFetched = (state: RootState) => state.quiz.value.name
-export const selectQuestion = (state: RootState, activityId: number): Question | undefined =>
+export const selectIsFetched = (state: RootState) => state.quiz.isFetched
+export const selectQuestion = (state: RootState, activityId: number): TQuestion =>
   getQuestionFromActivity(state.quiz, activityId)
 
-export const selectQuestions = (state: RootState, activityId: number): Question[] | [] =>
+export const selectQuestions = (state: RootState, activityId: number): TQuestion[] | [] =>
   getQuestionsFromActivity(state.quiz, activityId) || []
 
-export const selectRounds = (state: RootState, activityId: number): QuestionRound[] => {
-  const rounds = state.quiz.value.activities[activityId].questions as QuestionRound[]
+export const selectRounds = (state: RootState, activityId: number): TQuestionRound[] => {
+  const rounds = state.quiz.value.activities[activityId].questions as TQuestionRound[]
   return rounds
 }
 
+export const selectActivity = (state: RootState, activityId: number): TActivity =>
+  state.quiz.value.activities[activityId]
+
 export const selectCurrentQuestion = (state: RootState, activityId: number): number =>
-  state.quiz.value.activities[activityId].current_question ?? -1
+  state.quiz.value.activities[activityId].current_question
 
 export const selectCurrentRound = (state: RootState, activityId: number): number =>
-  state.quiz.value.activities[activityId].current_round ?? -1
+  state.quiz.value.activities[activityId].type === 'round'
+    ? state.quiz.value.activities[activityId].current_round
+    : -1
 
-const getQuestionFromActivity = (state: QuizState, activityId: number): Question | undefined => {
+const getQuestionFromActivity = (state: QuizState, activityId: number): TQuestion => {
   const questions = getQuestionsFromActivity(state, activityId)
   const currentQuestion = state.value.activities?.[activityId]?.current_question
-  if (currentQuestion === undefined || questions === undefined) return
   return questions[currentQuestion]
 }
 
-const getQuestionsFromActivity = (state: QuizState, activityId: number): Question[] | undefined => {
+const getQuestionsFromActivity = (state: QuizState, activityId: number): TQuestion[] => {
   const activity = state.value.activities?.[activityId]
 
-  if (isListQuestionType(activity.questions)) {
+  if (activity.type === 'question') {
     return activity.questions
-  } else if (isListQuestionRoundType(activity.questions)) {
-    const currentRound = activity?.current_round
-    if (currentRound === undefined) return
+  } else if (activity.type === 'round') {
+    const currentRound = activity.current_round
     const round = activity.questions[currentRound]
     return round.questions
   }
+  return []
 }
 
-export const getQuiz = createAsyncThunk('quiz/fetchQuiz', async () => {
-  const response = await fetchQuiz()
-  return response
-})
+const transformActivity = (activity: TActivity): TActivity => {
+  if (isListQuestionRoundType(activity.questions)) {
+    return {
+      ...activity,
+      type: 'round',
+      current_question: 0,
+      is_completed: false,
+      current_round: 0,
+      questions: activity.questions,
+    }
+  } else if (isListQuestionType(activity.questions)) {
+    return {
+      ...activity,
+      type: 'question',
+      current_question: 0,
+      is_completed: false,
+      questions: activity.questions,
+    }
+  } else {
+    return activity
+  }
+}
+
+export const isListQuestionRoundType = (
+  questions: TQuestion[] | TQuestionRound[]
+): questions is TQuestionRound[] => {
+  return questions.length > 0 && 'round_title' in questions[0]
+}
+
+export const isListQuestionType = (
+  questions: TQuestion[] | TQuestionRound[]
+): questions is TQuestion[] => {
+  return questions.length > 0 && 'stimulus' in questions[0]
+}

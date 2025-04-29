@@ -1,28 +1,40 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAppSelector } from '../app/hooks'
-import { selectRounds } from '../features/quiz/quizSlice'
-import { QuestionRound, Question } from '../features/quiz/quizAPI'
-import { isQuestionRoundType, isQuestionType } from '../lib/helpers'
+import { selectActivity } from '../features/quiz/quizSlice'
+import { TQuestionRound, TQuestion } from '../features/quiz/quizAPI'
 
 function Result() {
   const { activityId } = useParams()
-  const rounds = useAppSelector((state) => selectRounds(state, Number(activityId)))
+  const activityIdNum = Number(activityId)
+
+  const activity = useAppSelector((state) => selectActivity(state, activityIdNum))
   const navigate = useNavigate()
+
+  const renderResults = () => {
+    if (activity.type === 'question') {
+      return activity.questions.map((question, index) => (
+        <QuestionResult key={index} question={question} />
+      ))
+    }
+
+    if (activity.type === 'round') {
+      return activity.questions.map((rounds, index) => <RoundResult key={index} rounds={rounds} />)
+    }
+
+    return <p>Invalid activity type</p>
+  }
+
   return (
     <div>
-      {rounds.map((round: Question | QuestionRound, index) => {
-        if (isQuestionType(round)) {
-          return <QuestionResult question={round} key={index} />
-        } else if (isQuestionRoundType(round)) {
-          return <RoundResult rounds={round} key={index} />
-        }
-      })}
+      <p>{activity.activity_name}</p>
+      <p>Results</p>
+      {renderResults()}
       <p onClick={() => navigate('../')}>Home</p>
     </div>
   )
 }
 
-function QuestionResult({ question }: { question: Question }) {
+function QuestionResult({ question }: { question: TQuestion }) {
   return (
     <p>
       Q{question.order}------
@@ -31,7 +43,7 @@ function QuestionResult({ question }: { question: Question }) {
   )
 }
 
-function RoundResult({ rounds }: { rounds: QuestionRound }) {
+function RoundResult({ rounds }: { rounds: TQuestionRound }) {
   return (
     <div>
       <p>{rounds.round_title}</p>

@@ -4,10 +4,12 @@ import { useAppSelector } from '../app/hooks'
 import { selectCurrentRound, selectRounds } from '../features/quiz/quizSlice'
 
 function Round() {
-  const navigate = useNavigate()
   const { activityId } = useParams()
-  const currentRound = useAppSelector((state) => selectCurrentRound(state, Number(activityId)))
-  const rounds = useAppSelector((state) => selectRounds(state, Number(activityId)))
+  const activityIdNum = Number(activityId)
+
+  const navigate = useNavigate()
+  const currentRound = useAppSelector((state) => selectCurrentRound(state, activityIdNum))
+  const rounds = useAppSelector((state) => selectRounds(state, activityIdNum))
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -18,9 +20,7 @@ function Round() {
     }
   }, [navigate])
 
-  return (
-    <div>{currentRound === undefined ? 'Invalid Round' : rounds[currentRound].round_title}</div>
-  )
+  return <div>{rounds[currentRound].round_title}</div>
 }
 
 export default Round

@@ -1,17 +1,9 @@
 import { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import type { JSX } from 'react'
-import {
-  getQuiz,
-  selectIsFetched,
-  selectQuiz,
-  selectStatus,
-  setQuestionId,
-  setRoundId,
-} from './quizSlice'
-import { Activity } from './quizAPI'
+import { getQuiz, selectIsFetched, selectQuiz, selectStatus, setUnfetch } from './quizSlice'
+import { TActivity } from './quizAPI'
 import { useNavigate } from 'react-router-dom'
-import { isQuestionRoundType, isQuestionType } from '../../lib/helpers'
 
 export const Quiz = (): JSX.Element => {
   const dispatch = useAppDispatch()
@@ -23,45 +15,34 @@ export const Quiz = (): JSX.Element => {
     if (status === 'idle' && !isFetched) {
       dispatch(getQuiz())
     }
-  }, [dispatch])
+  }, [dispatch, status])
 
+  const handleRefetch = () => {
+    dispatch(setUnfetch())
+    window.location.reload()
+  }
   return (
     <div>
-      <div>
-        <p>{quiz?.name}</p>
-        <p>{quiz?.heading}</p>
-        <ul className="list-none">
-          {quiz.activities.map((activity: Activity, index) => (
-            <li key={index}>
-              <ActivityLink activity={activity} activityId={index} />
-            </li>
-          ))}
-        </ul>
-      </div>
+      <p>{quiz.name}</p>
+      <p>{quiz.heading}</p>
+      <ul className="list-none">
+        {quiz.activities.map((activity: TActivity, index) => (
+          <li key={index}>
+            <ActivityLink activity={activity} activityId={index} />
+          </li>
+        ))}
+      </ul>
+      <p onClick={handleRefetch}>Refetch</p>
     </div>
   )
 }
 
-const ActivityLink = ({ activity, activityId }: { activity: Activity; activityId: number }) => {
+const ActivityLink = ({ activity, activityId }: { activity: TActivity; activityId: number }) => {
   const navigate = useNavigate()
-  const dispatch = useAppDispatch()
 
   const handleNavigate = () => {
-    if (activity.questions.length < 1) {
-      alert('No Questions')
-      return
-    }
-    const questionOrRound = activity.questions[0]
-    if (isQuestionRoundType(questionOrRound)) {
-      dispatch(setRoundId({ activityId, roundId: 0 }))
-      dispatch(setQuestionId({ activityId, questionId: 0 }))
-      navigate(`../round/${activityId}`)
-    } else if (isQuestionType(questionOrRound)) {
-      dispatch(setQuestionId({ activityId, questionId: 0 }))
-      navigate(`../question/${activityId}`)
-    } else {
-      alert('Question Type is not defined')
-    }
+    if (activity.is_completed) navigate(`../result/${activityId}`)
+    else navigate(`../${activity.type}/${activityId}`)
   }
 
   return <div onClick={handleNavigate}>{activity.activity_name}</div>

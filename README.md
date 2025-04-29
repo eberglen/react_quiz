@@ -1,5 +1,52 @@
 # React + TypeScript + Vite
 
+## Setup
+
+1. Install dependencies
+
+```
+npm install
+```
+
+2. Run
+
+```
+npm run dev
+```
+
+## Tech Stack
+
+- **React** - UI Library
+- **TypeScript** - Language
+- **Redux Toolkit** - State Management
+- **Tailwind** - Styling
+
+## Features
+
+- Currently supportes 2 types of activity: _Questions_ and _Rounds with Questions_
+- Vertically scalable to support a varying number of activities
+- Persists data in cases of unstable connection
+- Protected routes and route validation
+
+## Folder
+
+`app` contains hooks and store from redux.
+
+`components` contains React elements for reusability.
+
+`features` contains the redux slices, API, and the component to display the fetched data.
+
+`screens` contains whole pages that is visible to the user.
+
+## User Flow
+
+1. User lands in Home Page which displays the list of Activities. `screens\Home.tsx`
+2. User clicks an activity. Check which flow should be used. `features\quiz\Quiz.tsx`
+3. User goes through the rounds or questions. `screens\Question.tsx` `screens\Round.tsx`
+4. User finishes and sees the result. `screens\Result.tsx`
+
+---
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
