@@ -5,8 +5,10 @@ import {
   selectCurrentQuestion,
   selectCurrentRound,
   selectQuestionByActivityId,
+  selectQuestions,
   selectQuestionsLength,
   selectRoundLength,
+  selectRounds,
   setAnswer,
   setQuestionId,
   setRoundId,
@@ -20,9 +22,7 @@ function Question() {
   const currentQuestion = useAppSelector((state) =>
     selectCurrentQuestion(state, Number(activityId))
   )
-  const questionsLength = useAppSelector((state) =>
-    selectQuestionsLength(state, Number(activityId))
-  )
+  const questions = useAppSelector((state) => selectQuestions(state, Number(activityId)))
 
   const questionDetails = useAppSelector((state) =>
     selectQuestionByActivityId(state, Number(activityId))
@@ -30,21 +30,23 @@ function Question() {
 
   const currentRound = useAppSelector((state) => selectCurrentRound(state, Number(activityId)))
 
-  const roundLength = useAppSelector((state) => selectRoundLength(state, Number(activityId)))
+  const rounds = useAppSelector((state) => selectRounds(state, Number(activityId)))
 
   const handleAnswer = (user_answer: boolean) => {
     dispatch(setAnswer({ activityId: Number(activityId), user_answer }))
     // dispatch(setQuestionId({ activityId: Number(activityId), questionId: currentQuestion + 1 }))
     if (currentQuestion === undefined) return
-    if (currentQuestion < questionsLength - 1) {
+    if (currentQuestion < questions.length - 1) {
       console.log('Next Question')
       // proceed to next question
       dispatch(setQuestionId({ activityId: Number(activityId), questionId: currentQuestion + 1 }))
     } else if (activityType === 'question') {
+      navigate(`../result/${activityId}`)
       console.log('Question Result')
       // navigate to result
     } else if (activityType === 'round') {
-      if (currentRound === roundLength - 1) {
+      if (currentRound === rounds.length - 1) {
+        navigate(`../result/${activityId}`)
         console.log('Round Result')
         // navigate to result
       } else {

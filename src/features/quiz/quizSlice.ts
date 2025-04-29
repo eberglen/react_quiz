@@ -1,7 +1,12 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { fetchQuiz, QuestionRoundType, QuestionType, QuizType } from './quizAPI'
 import { RootState } from '../../app/store'
-import { checkActivityType } from '../../lib/helpers'
+import {
+  isListQuestionRoundType,
+  isListQuestionType,
+  isQuestionRoundType,
+  isQuestionType,
+} from '../../lib/helpers'
 
 export interface QuizState {
   value: QuizType
@@ -115,14 +120,19 @@ export const selectQuestionByActivityId = (state: RootState, activityId: number)
 export const selectQuestionsLength = (state: RootState, activityId: number): number =>
   getQuestionsFromActivity(state.quiz, activityId).length
 
+export const selectQuestions = (state: RootState, activityId: number): QuestionType[] =>
+  getQuestionsFromActivity(state.quiz, activityId)
+
 export const selectCurrentQuestion = (state: RootState, activityId: number): number | undefined =>
   state.quiz.value.activities?.[activityId]?.current_question
 
 export const selectCurrentRound = (state: RootState, activityId: number): number | undefined =>
   state.quiz.value.activities?.[activityId]?.current_round
 
-export const selectRoundLength = (state: RootState, activityId: number): number =>
-  state.quiz.value.activities?.[activityId]?.questions.length
+export const selectRounds = (state: RootState, activityId: number): QuestionRoundType[] => {
+  const rounds = state.quiz.value.activities?.[activityId].questions as QuestionRoundType[]
+  return rounds
+}
 
 const getQuestionFromActivity = (state: QuizState, activityId: number): QuestionType => {
   const questions = getQuestionsFromActivity(state, activityId)
@@ -148,18 +158,32 @@ const getQuestionFromActivity = (state: QuizState, activityId: number): Question
 
 const getQuestionsFromActivity = (state: QuizState, activityId: number): QuestionType[] => {
   const activity = state.value.activities?.[activityId]
-  const activityType = activity.type
+  // const activityType = activity.type
 
-  switch (activityType) {
-    case 'round':
-      const currentRound = activity?.current_round
-      if (currentRound === undefined) return ''
-      const round = activity.questions[currentRound] as QuestionRoundType
-      return round.questions
-    case 'question':
-      return activity.questions as QuestionType[]
-    default:
-      return ''
+  // switch (activityType) {
+  //   case 'round':
+  //     const currentRound = activity?.current_round
+  //     if (currentRound === undefined) return ''
+  //     const round = activity.questions[currentRound] as QuestionRoundType
+  //     return round.questions
+  //   case 'question':
+  //     return activity.questions as QuestionType[]
+  //   // default:
+  //   //   return ''
+  // }
+  // if (activity.questions.length < 1) return
+
+  // const question = activity.questions[0]
+
+  if (isListQuestionType(activity.questions)) {
+    return activity.questions
+  } else if (isListQuestionRoundType(activity.questions)) {
+    const currentRound = activity?.current_round
+    if (currentRound === undefined) return ''
+    const round = activity.questions[currentRound]
+    return round.questions
+  } else {
+    return ''
   }
 }
 

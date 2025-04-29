@@ -6,6 +6,7 @@ import Activity from './screens/Activity'
 import Layout from './Layout'
 import Question from './screens/Question'
 import Round from './screens/Round'
+import Result from './screens/Result'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="question/:activityId" element={<Question />} />
           <Route path="round/:activityId" element={<Round />} />
+          <Route path="result/:activityId" element={<Result />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -21,3 +21,27 @@ export const checkActivityType = (
   if ('round_title' in question) return 'round'
   if ('stimulus' in question) return 'question'
 }
+
+export const isQuestionRoundType = (
+  question: QuestionType | QuestionRoundType
+): question is QuestionRoundType => {
+  return 'round_title' in question
+}
+
+export const isQuestionType = (
+  question: QuestionType | QuestionRoundType
+): question is QuestionType => {
+  return 'stimulus' in question
+}
+
+export const isListQuestionRoundType = (
+  questions: QuestionType[] | QuestionRoundType[]
+): questions is QuestionRoundType[] => {
+  return questions.length > 0 && 'round_title' in questions[0]
+}
+
+export const isListQuestionType = (
+  questions: QuestionType[] | QuestionRoundType[]
+): questions is QuestionType[] => {
+  return questions.length > 0 && 'stimulus' in questions[0]
+}
