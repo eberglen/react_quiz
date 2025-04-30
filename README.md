@@ -45,6 +45,23 @@ npm run dev
 3. User goes through the rounds or questions. `screens\Question.tsx` `screens\Round.tsx`
 4. User finishes and sees the result. `screens\Result.tsx`
 
+## Scaling the Project
+
+For a new type of question that needs to be added, we mainly want to add parsing of the data and defining the flow:
+
+- `features/quiz/quizAPI.ts`
+  - Add the new type structure
+- `features/quiz/quizSlice.ts`
+  - Update `extraReducers` to handle the parsing of the new type
+  - Add selectors to retrieve properties from the new type
+- `features/quiz/Quiz.tsx`
+  - Add the initial flow of the new type
+- `screens`
+  - Add new screens if needed for the flow
+  - Add conditions to dictate the flow
+
+If the file gets too big, for example in quizSlice, we can extract the functions or methods and divide it into smaller files per question type.
+
 ---
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
