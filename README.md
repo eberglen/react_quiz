@@ -62,6 +62,21 @@ For a new type of question that needs to be added, we mainly want to add parsing
 
 If the file gets too big, for example in quizSlice, we can extract the functions or methods and divide it into smaller files per question type.
 
+## Test Cases
+
+- Clicking an activity with questions should navigate you to the question screen
+- Clicking an activity with rounds should navigate you to round screen then question screen
+- Answering a question should navigate you to the next question
+- Answering the last question in a question type should navigate you to the result screen
+- Answering the last question in a round type should navigate you to the next round
+- Accessing the result screen without completing the activity should navigate you back to the home screen
+- Accessing a page with invalid parameter should navigate you back to the home screen
+- Accessing a non-existing page should show the 404 error page
+- Exiting an unfinished activity, then going back should resume you to your current progress
+- Clicking a completed activity should navigate you to the result screen
+- Clicking home in the result screen should navigate you to the home screen
+- Clicking reset in home screen should reset your progress on all the activities
+
 ---
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
