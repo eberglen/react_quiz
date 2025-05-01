@@ -87,8 +87,7 @@ export const selectQuestions = (state: RootState, activityId: number): TQuestion
   getQuestionsFromActivity(state.quiz, activityId) || []
 
 export const selectRounds = (state: RootState, activityId: number): TQuestionRound[] => {
-  const rounds = state.quiz.value.activities[activityId].questions as TQuestionRound[]
-  return rounds
+  return state.quiz.value.activities[activityId].questions as TQuestionRound[]
 }
 
 export const selectActivity = (state: RootState, activityId: number): TActivity =>

@@ -12,6 +12,7 @@ import {
   setNextQuestion,
   setNextRound,
 } from '../features/quiz/quizSlice'
+import Card from '../components/Card.tsx'
 
 function Question() {
   const { activityId } = useParams()
@@ -27,6 +28,22 @@ function Question() {
   const questions = useAppSelector((state) => selectQuestions(state, activityIdNum))
   const currentRound = useAppSelector((state) => selectCurrentRound(state, activityIdNum))
   const rounds = useAppSelector((state) => selectRounds(state, activityIdNum))
+
+  const renderText = (text: string) => {
+    const parts = text.split('*')
+    return parts.map((part, index) => {
+      if (index % 2 !== 0) {
+        // Apply font-bold class to the parts between '*' (i.e., the bold part)
+        return (
+          <span key={index} className="font-bold">
+            {part}
+          </span>
+        )
+      } else {
+        return part
+      }
+    })
+  }
 
   const handleAnswer = (user_answer: boolean) => {
     dispatch(setAnswer({ activityId: activityIdNum, user_answer }))
@@ -55,14 +72,37 @@ function Question() {
     }
   }
   return (
-    <div>
-      Question
-      <p>No. {questionDetails.order}</p>
-      <p>{questionDetails.stimulus}</p>
-      <button onClick={() => handleAnswer(true)}>True</button>
-      <button onClick={() => handleAnswer(false)}>False</button>
+    <Card>
+      <p className="italic text-xs">{activity.activity_name}</p>
+      <div className="my-8">
+        <div className="flex flex-row items-end justify-between">
+          <p className="text-2xl">Q{questionDetails.order}</p>
+          {activity.type === 'round' && (
+            <p className="italic text-xs">Round {activity.current_round + 1}</p>
+          )}
+        </div>
+        <hr className="h-px bg-gray-400 border-0" />
+      </div>
+
+      <div className="my-4">
+        <p className="text-xl text-center">"{renderText(questionDetails.stimulus)}"</p>
+      </div>
+      <div className="flex divide-x mt-8 divide-gray-300">
+        <button
+          className="flex-grow py-3 hover:bg-gray-200 hover:cursor-pointer text-lg text-shadow-sm"
+          onClick={() => handleAnswer(true)}
+        >
+          True
+        </button>
+        <button
+          className="flex-grow py-3 hover:bg-gray-200 hover:cursor-pointer text-lg text-shadow-sm"
+          onClick={() => handleAnswer(false)}
+        >
+          False
+        </button>
+      </div>
       <p>{questionDetails.user_answers}</p>
-    </div>
+    </Card>
   )
 }
 

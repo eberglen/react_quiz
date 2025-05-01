@@ -18,7 +18,7 @@ function Round() {
     return () => {
       clearTimeout(timer)
     }
-  }, [navigate])
+  }, [navigate, activityId])
 
   return <div>{rounds[currentRound].round_title}</div>
 }
