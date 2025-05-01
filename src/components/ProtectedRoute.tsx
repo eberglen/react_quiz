@@ -20,6 +20,11 @@ const ProtectedRoute = () => {
     if (!is_complete) return <Navigate to="/" />
   }
 
+  if (location.pathname.startsWith('/question') || location.pathname.startsWith('/round')) {
+    const is_complete = quiz.activities[activityIdNum].is_completed
+    if (is_complete) return <Navigate to={`/result/${activityId}`} />
+  }
+
   return <Outlet />
 }
 
