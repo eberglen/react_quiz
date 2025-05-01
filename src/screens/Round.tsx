@@ -20,7 +20,7 @@ function Round() {
     }
   }, [navigate, activityId])
 
-  return <div>{rounds[currentRound].round_title}</div>
+  return <div className="text-3xl">{rounds[currentRound].round_title}</div>
 }
 
 export default Round
