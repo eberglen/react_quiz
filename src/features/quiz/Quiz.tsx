@@ -4,6 +4,7 @@ import type { JSX } from 'react'
 import { getQuiz, selectIsFetched, selectQuiz, selectStatus, setUnfetch } from './quizSlice'
 import { TActivity } from './quizAPI'
 import { useNavigate } from 'react-router-dom'
+import refreshIcon from '../../assets/refresh.svg'
 
 export const Quiz = (): JSX.Element => {
   const dispatch = useAppDispatch()
@@ -15,24 +16,33 @@ export const Quiz = (): JSX.Element => {
     if (status === 'idle' && !isFetched) {
       dispatch(getQuiz())
     }
-  }, [dispatch, status])
+  }, [dispatch, status, isFetched])
 
   const handleRefetch = () => {
     dispatch(setUnfetch())
-    window.location.reload()
   }
   return (
     <div>
-      <p>{quiz.name}</p>
-      <p>{quiz.heading}</p>
-      <ul className="list-none">
+      <div className="flex flex-row justify-between">
+        <div className="mb-4">
+          <p className="text-3xl">{quiz.name}</p>
+          <p className="text-sm text-gray-500">{quiz.heading}</p>
+        </div>
+        <button onClick={handleRefetch}>
+          <img
+            src={refreshIcon}
+            className="w-6 h-6 hover:cursor-pointer hover:bg-gray-200"
+            alt="refresh"
+          />
+        </button>
+      </div>
+      <div className="divide-y divide-gray-300">
         {quiz.activities.map((activity: TActivity, index) => (
-          <li key={index}>
+          <div key={activity.order}>
             <ActivityLink activity={activity} activityId={index} />
-          </li>
+          </div>
         ))}
-      </ul>
-      <p onClick={handleRefetch}>Refetch</p>
+      </div>
     </div>
   )
 }
@@ -45,5 +55,53 @@ const ActivityLink = ({ activity, activityId }: { activity: TActivity; activityI
     else navigate(`../${activity.type}/${activityId}`)
   }
 
-  return <div onClick={handleNavigate}>{activity.activity_name}</div>
+  const renderStatus = () => {
+    if (activity.is_completed) {
+      return (
+        <div className="flex flex-row gap-2 italic text-xs">
+          <span className="text-gray-500">Status</span>
+          <span className="text-gray-400">Completed</span>
+        </div>
+      )
+    }
+    if (activity.type === 'question' && activity.current_question > 0) {
+      return (
+        <div className="flex flex-row gap-2 italic text-xs">
+          <span className="text-gray-500">Status</span>
+          <span className="text-gray-400">Question: {activity.current_question + 1}</span>
+        </div>
+      )
+    }
+    if (
+      activity.type === 'round' &&
+      (activity.current_question > 0 || activity.current_round > 0)
+    ) {
+      return (
+        <div className="flex flex-row gap-2 italic text-xs">
+          <span className="text-gray-500">Status</span>
+          <span className="text-gray-400">Round: {activity.current_round + 1}</span>
+          <span className="text-gray-400">Question: {activity.current_question + 1}</span>
+        </div>
+      )
+    }
+
+    return (
+      <div className="flex flex-row gap-2 italic text-xs">
+        <span className="text-gray-500">Status</span>
+        <span className="text-gray-400">Unstarted</span>
+      </div>
+    )
+  }
+
+  return (
+    <button
+      className="w-full hover:bg-gray-200 hover:cursor-pointer rounded-md"
+      onClick={handleNavigate}
+    >
+      <div className="p-2 ">
+        <p className="text-start">{activity.activity_name}</p>
+        {renderStatus()}
+      </div>
+    </button>
+  )
 }

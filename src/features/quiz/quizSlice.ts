@@ -5,7 +5,7 @@ import { RootState } from '../../app/store'
 export interface QuizState {
   value: TQuiz
   status: 'idle' | 'loading' | 'failed'
-  isFetched: Boolean
+  isFetched: boolean
 }
 
 export type AnswerPayload = {
@@ -20,8 +20,7 @@ const initialState: QuizState = {
 }
 
 export const getQuiz = createAsyncThunk('quiz/fetchQuiz', async () => {
-  const response = await fetchQuiz()
-  return response
+  return await fetchQuiz()
 })
 
 export const quizSlice = createSlice({
