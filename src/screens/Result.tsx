@@ -2,6 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAppSelector } from '../app/hooks'
 import { selectActivity } from '../features/quiz/quizSlice'
 import { TQuestionRound, TQuestion } from '../features/quiz/quizAPI'
+import { motion } from 'framer-motion'
 
 function Result() {
   const { activityId } = useParams()
@@ -35,7 +36,13 @@ function Result() {
   }
 
   return (
-    <div className="flex flex-col items-center bg-gray-50 p-6 rounded-md shadow-sm m-6 min-w-1/3">
+    <motion.div
+      className="flex flex-col items-center bg-gray-50 p-6 rounded-md shadow-sm m-6 min-w-1/3"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.1 }}
+    >
       <p className="text-lg">{activity.activity_name}</p>
       <p className="text-gray-500 text-sm">Results</p>
       <div className="min-w-full">{renderResults()}</div>
@@ -45,13 +52,13 @@ function Result() {
       >
         Home
       </button>
-    </div>
+    </motion.div>
   )
 }
 
 function QuestionResult({ question }: Readonly<{ question: TQuestion }>) {
   return (
-    <div className="flex flex-row justify-between">
+    <div className="flex flex-row justify-between hover:bg-gray-200">
       <span>Q{question.order}</span>
       <span>
         {question.user_answers === question.is_correct ? 'CORRECT' : question.is_correct.toString()}

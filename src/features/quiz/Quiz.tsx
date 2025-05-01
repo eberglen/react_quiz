@@ -21,6 +21,29 @@ export const Quiz = (): JSX.Element => {
   const handleRefetch = () => {
     dispatch(setUnfetch())
   }
+
+  if (status === 'loading')
+    return (
+      <div className="max-w-sm animate-pulse">
+        <div className="h-2.5 bg-gray-200 rounded-full  w-48 mb-4"></div>
+        <div className="h-2 bg-gray-200 rounded-full max-w-[360px] mb-2.5"></div>
+        <div className="h-2 bg-gray-200 rounded-full mb-2.5"></div>
+        <div className="h-2 bg-gray-200 rounded-full max-w-[330px] mb-2.5"></div>
+        <div className="h-2 bg-gray-200 rounded-full max-w-[300px] mb-2.5"></div>
+        <div className="h-2 bg-gray-200 rounded-full max-w-[360px]"></div>
+      </div>
+    )
+
+  if (status === 'failed')
+    return (
+      <div className="flex flex-row items-center flex-grow gap-1">
+        Cannot load quiz. Please click
+        <button className="text-blue-500" onClick={handleRefetch}>
+          Refresh
+        </button>
+      </div>
+    )
+
   return (
     <div>
       <div className="flex flex-row justify-between">

@@ -20,6 +20,7 @@ const initialState: QuizState = {
 }
 
 export const getQuiz = createAsyncThunk('quiz/fetchQuiz', async () => {
+  await setTimeout(async () => {}, 1000)
   return await fetchQuiz()
 })
 
@@ -50,6 +51,7 @@ export const quizSlice = createSlice({
     },
     setUnfetch: (state) => {
       state.isFetched = false
+      state.status = 'idle'
     },
   },
   extraReducers: (builder) => {
